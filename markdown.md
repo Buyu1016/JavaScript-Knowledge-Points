@@ -24,3 +24,60 @@
     }
     print()
 ```
+
+# == 和 === 的区别? 分别在什么情况下使用?
+
+## 答: ==会进行类型转换进行比较, ===是不会进行类型转换直接进行比较的。除了值为null或者undefined的情况下用相等，建议其他情况下采用全等
+
+```
+    const obj1 = {
+        a: 1
+    }
+    const obj2 = obj1
+    const obj3 = {
+        a: 1
+    }
+    // == 相等
+    console.log(true == 1) // true
+    console.log(false == 0) // true
+    console.log('1' == 1) // true
+    console.log(null == null) // true
+    console.log(undefined == undefined) // true
+    console.log(null == undefined) // true
+    console.log(NaN == NaN) // false
+    console.log(NaN == null) // false
+    console.log(NaN == undefined) // false
+    console.log(obj1 == obj2) // true 引用类型比较的是地址
+    console.log(obj1 == obj3) // false
+
+    // === 全等
+    console.log(true === 1) // false
+    console.log(false === 0) // false
+    console.log('1' === 1) // false
+    console.log(1 === 1) // true
+    console.log(null === null) // true
+    console.log(undefined === undefined) // true
+    console.log(null === undefined) // false
+    console.log(NaN === NaN) // false
+    console.log(NaN === null) // false
+    console.log(NaN === undefined) // false
+    console.log(obj1 === obj2) // true 引用类型比较的是地址
+    console.log(obj1 === obj3) // false
+```
+
+# 如何理解原型? 原型链?
+
+## 答: 此回答不固定，请看图自行理解在进行回答
+
+### 一张图帮你理解原型链
+
+```
+    class Student {
+        constructor(name) {
+            this.name = name
+        }
+    }
+    const student1 = new Student('CodeGorgeous')
+```
+
+![原型链示意图](./image/原型链示意图.jpg)
