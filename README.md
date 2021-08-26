@@ -2,4 +2,4 @@
 
 ## JavaScript知识点
 
-## 在线版: js.codegorgeous.top
+## 在线版: ![点击进入](js.codegorgeous.top)
