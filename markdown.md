@@ -238,3 +238,58 @@
 #### 寄生组合式继承
 
 #### Es6的继承基本类似于寄生组合式继承
+
+```
+    // 实现寄生组合式继承
+    function People(name,phone) {
+        this.name = name
+        this.phone = phone
+    }
+    People.prototype.write = function(content) {
+        return content
+    }
+    People.prototype.read = function() {
+        return `我叫${this.name},我的电话为${this.phone}`
+    }
+
+    function Male(name,phone) {
+        People.call(this,name,phone)
+        this.sex = '男'
+    }
+    Male.prototype = Object.create(People.prototype)
+    Male.prototype.constructor = Male
+
+    Male.prototype.read = function() {
+        return `我叫${this.name},我是个${this.sex}孩子,我的电话为${this.phone}`
+    }
+    Male.prototype.song = function() {
+            return `
+                See You Again
+                It's been a long day without you my friend
+                And I'll tell you all about it when I see you again
+                We've come a long way from where we began
+                Oh I'll tell you all about it when I see you again
+            `
+    }
+    const male = new Male('CodeGorgeous','176xxxxx940')
+    console.log(male.write('集中一点,登峰造极')) // 集中一点,登峰造极
+    console.log(male.read()) // 我叫CodeGorgeous,我是个男孩子,我的电话为176xxxxx940
+    console.log(male.song()) // See You Again ...... Oh I'll tell you all about it when I see you again
+
+    function WoMan(name,phone) {
+        People.call(this,name,phone)
+        this.sex = '女'
+    }
+    WoMan.prototype = Object.create(People.prototype)
+    WoMan.prototype.constructor = WoMan
+    WoMan.prototype.read = function() {
+        return `我叫${this.name},我是个${this.sex}孩子,我的电话为${this.phone}`
+    }
+    WoMan.prototype.dance = function() {
+        return `💃💃💃💃💃💃💃💃💃💃💃💃💃💃💃💃💃💃`
+    }
+    const woman = new WoMan('maomao','178xxxxx066')
+    console.log(woman.write('蜡笔小新')) // 蜡笔小新
+    console.log(woman.read()) // 我叫maomao,我是个女孩子,我的电话为178xxxxx066
+    console.log(woman.dance()) // 💃💃💃💃💃💃💃💃💃💃💃💃💃💃💃💃💃💃
+```
