@@ -293,3 +293,131 @@
     console.log(woman.read()) // 我叫maomao,我是个女孩子,我的电话为178xxxxx066
     console.log(woman.dance()) // 💃💃💃💃💃💃💃💃💃💃💃💃💃💃💃💃💃💃
 ```
+
+# 如何理解this指向?
+
+**注意: 这里只讨论非严格模式下**
+
+## 答: this的指向在函数创建阶段是无法确定的, 在绝大多数的情况下是谁调用了this就指向谁
+
+### 其他情况:
+
+```
+    let obj = {
+        a: 1,
+        b: {
+            a: 2,
+            print() {
+                console.log(this.a)
+            }
+        }
+    }
+    obj.b.print() // 2 // this不会产生作用域链这样形式的存在,就只会根据上一级的对象
+    const result = obj.b.print
+    result() // undefined 为什么这里会指向Window? 因为仔细看现在调用该函数的环境已经处于Window中,或者说result已经处于Window环境中
+
+    // 特殊的一种例子
+    function print(name) {
+        this.name = name
+        return
+    }
+    const print1 = new print('CodeGorgeous') // 注意点: new关键词会改变this指向, 会指向实例对象(返回一个引用类型(null)例外)
+    console.log(print1.name) // xingjun 当函数返回值为一个引用类型(null除外)的时候, this会指向到返回的对象内
+```
+
+# 如何理解执行期上下文和执行栈?
+
+## 答: 执行期上下文分为全局执行期上下文、函数执行期上下文、Eval执行期上下文(比较特殊的一个). 执行栈也叫做调用栈, 用于存储执行期上下文
+
+### 执行期上下文存在生命周期: 创建阶段 -> 执行阶段 -> 回收阶段 
+
+### 执行栈会在代码开始运行的时候创建一个全局执行期上下文操作, 并将其压入栈中, 每执行到函数的时候就创建一个函数执行期上下文操作, 也会压入栈中, 当函数执行完毕后就会将该函数的执行期上下文推出栈, 当执行完成代码后就会将全局执行期上下文推出栈, 程序运行完成
+
+**更加详细请参考: [点击进入](https://mp.weixin.qq.com/s/FUYdVhz7KVCiSE_rDhVJUA)**
+
+# 如何理解事件模型?
+
+## 答: 事件模型可以分为三种: 原始事件模型、标准事件模型、IE事件模型
+
+### 原始事件模型
+
+#### 特点: 支持冒泡, 不支持捕获, 同一类型的事件只能绑定一个函数
+
+```
+    const oBtn = document.querySelector('button')
+
+    oBtn.onclick = (e) => {
+        console.log('原始事件模型', '1', e)
+    }
+    oBtn.onclick = (e) => {
+        console.log('原始事件模型', '2', e)
+    }
+
+    // 当点击按钮后, 只会触发最后一个函数
+
+    // 取消事件方式
+    oBtn.onclick = null
+```
+
+### 标准事件模型
+
+#### 特点: 支持冒泡, 支持捕获, 同一类型事件可绑定多个函数
+
+```
+    const oBtn = document.querySelector('button')
+
+    oBtn.addEventListener('click', clickOne)
+    function clickOne(e) {
+        console.log('clickOne', e)
+    }
+    // 第三个参数决定了这个事件绑定的这个函数是在哪个阶段执行, false为冒泡阶段, true为捕获阶段, 默认为false
+    oBtn.addEventListener('click', clickTwo, true)
+    function clickTwo(e) {
+        console.log('clickTwo', e)
+    }
+    // 当点击按钮后, 先触发clickTwo然后触发clickOne
+
+    // 取消事件方式
+    oBtn.removeEventListener('click', clickOne)
+```
+
+### IE事件模型
+
+#### 由于本人无IE浏览器所以无法实测, 关于IE事件模型请[点击进入](https://blog.csdn.net/Picking_up_stones/article/details/61926228)
+
+# 如何理解typeof和instanceof的区别?
+
+## 答: typeof会返回数据的类型, instanceof会顺着原型链进行查找(无法正确判断基本类型), 找到则为true反之为false, 一般typeof用于判断基本类型, instanceof用于判断复杂类型,但是在判定数组是也要多判断一次, 因为Array也属于Object, 一般推荐使用Object.prototype.toString.call(target)进行判别数据类型
+
+```
+    // typeof
+    console.log(typeof 1) // number
+    console.log(typeof '1') // string
+    console.log(typeof Symbol()) // symbol  于Es6加入基本类型
+    console.log(typeof 1n) // bigint    于ES2019加入基本类型
+    console.log(typeof true) // boolean
+    console.log(typeof undefined) // undefined
+    console.log(typeof null) // object
+    console.log(typeof NaN) // number
+    console.log(typeof []) // object    数据类型不准确
+    console.log(typeof {}) // object
+    console.log(typeof function(){}) // function
+
+    // instanceof
+    console.log(1 instanceof Number) // false   无法判断基本类型
+    console.log([] instanceof Array) // true
+    console.log([] instanceof Object) // true 由于Array也属于Object所以对于判定是否为数组时应该多判断一下
+    console.log({} instanceof Object) // true
+
+    // 推荐使用判断数据类型的方法
+    console.log(Object.prototype.toString.call(1)) // [object Number]
+    console.log(Object.prototype.toString.call('1'))// [object String]
+    console.log(Object.prototype.toString.call(true)) // [object Boolean]
+    console.log(Object.prototype.toString.call(Symbol())) // [object Symbol]
+    console.log(Object.prototype.toString.call(1n)) // [object Bigint]
+    console.log(Object.prototype.toString.call(undefined)) // [object Undefined]
+    console.log(Object.prototype.toString.call(null)) // [object Null]
+    console.log(Object.prototype.toString.call(function(){})) // [object Function]
+    console.log(Object.prototype.toString.call([])) // [object Array]
+    console.log(Object.prototype.toString.call({})) // [object Object]
+```
