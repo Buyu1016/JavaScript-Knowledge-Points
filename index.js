@@ -1,19 +1,17 @@
-function Student(name, sex) {
-    this.name = name;
-    this.sex = sex
+var name = "maomao"
+const obj = {
+    name: 'CodeGorgeous',
+    print(sex, age) {
+        console.log(this.name, sex, age)
+    }
 }
-const student1 = new Student('CodeGorgeous', 'male')
-console.log(student1)
-
-// 手动实现new操作符
-function myNew(fn, ...arg) {
-    // 创建对象
-    const obj = {}
-    // 连接原型链
-    obj.__proto__ = fn.prototype
-    // 改变this指向
-    const resutl = fn.apply(obj,arg)
-    return resutl instanceof Object ? resutl : obj
-}
-const student2 = myNew(Student, 'maomao', 'woman')
-console.log(student2)
+obj.print('male', 21) // CodeGorgeous 21
+obj.print.call(window, 'woman', 14) // maomao 14
+obj.print.apply(window, ['woman', 14]) // maomao 14
+let result = obj.print.bind(window)
+result() // maomao undefined undefined
+result = result.bind(window, 'woman')
+result() // maomao woman undefined
+result = result.bind(window, 14) // 分多次上传
+result() // maomao woman 14
+obj.print('male', 21) // CodeGorgeous male 14

@@ -462,7 +462,7 @@
 
 # 如何理解new操作符?
 
-## 答: new操作符用于创建一个给定构造函数的示例对象
+## 答: new操作符用于创建一个给定构造函数的实例对象
 
 ### new操作符执行流程: 创建对象 -> 将对象的__proto__连接到构造函数的prototype上 -> 改变构造函数的this指向, 指向到创建的对象 -> 看构造函数是否返回基本数据类型, 如果返回返回对象则正常处理
 
@@ -486,4 +486,88 @@
     }
     const student2 = myNew(Student, 'maomao', 'woman')
     console.log(student2)
+```
+
+# 如何理解Ajax?Ajax实现方式?
+
+## 答: Ajax可以在不重新加载整个网页的情况下与服务器交换数据, 并只会让部分网页的内容发生变化
+
+### Ajax的流程: 创建XMLHttpRequest对象 -> 通过XMLHttpRequest对象的open()方法配置请求的信息 -> 通过XMLHttpRequest对象的send()发送请求 -> 通过XMLHttpRequest的onreadystatechange事件监听服务器端的通信状态进程 -> 根据XMLHttpRequest对象的readyState的状态判别是否请求完毕 -> 根据XMLHttpRequest对象的状态码进行判别请求的结果(成功/失败) -> 返回给响应的回调函数
+
+```
+    // 简单版本的ajax请求
+    function Ajax(option) {
+        const request = new XMLHttpRequest()
+        // 初始化配置参数
+        option = option || {}
+        // 请求方式默认为Get请求,全字母大写
+        option.methods = (option.methods || 'GET').toUpperCase()
+        option.dataType = option.dataType || 'json'
+        option.async = option.async || true
+        option.params = option.params || ''
+        option.data = option.data || {}
+        if (!option.url) {
+            throw new Error('缺少配置参数url')
+        }
+        // GET请求
+        if (option.methods === 'GET') {
+            request.open(option.methods, `${ option.url }${ option.params ? '?' + option.params : '' }`, option.async)
+            // 发送请求
+            request.send()
+        } else if (option.methods === 'POST') {
+            request.open(option.methods, option.url, option.async)
+            // 发送请求, 可携带body体
+            request.send(option.data)
+        }
+        // 接受响应
+        request.onreadystatechange = function(e){
+            // request.readyState具有5个阶段
+            if(request.readyState === 4){ // 整个请求过程完毕
+                // 响应状态码
+                if(request.status >= 200 && request.status <= 300){
+                    option.success && option.success(request.responseText) // 服务端返回的结果
+                }else if(request.status >=400){
+                    option.error && option.error(request.status)
+                }
+            }
+        }
+    }
+
+    Ajax({
+        methods: 'GET',
+        url: 'https://restapi.amap.com/v3/config/district',
+        data: {},
+        params: 'key=ce58ad8ea5e635cfef7becb6d1cc1b27',
+        dataType: 'json',
+        success: function(text) { // 成功的回调
+            console.log(text)
+        },
+        error: (err) => { // 失败的回调
+            console.error(err)
+        }
+    })
+```
+
+# 如何理解apply、call、bind的区别?
+
+## 答: apply、call、bind的都能够改变this的指向, apply传入的第二个参数为数组, call传入的第二个参数为参数列表, bind传入的第二个参数为参数列表且能够分多次传入参数, apply、call是会立即执行并且只会改变一次this指向, bind则是会永久改变this指向, 并且会返回一个改变过this指向的函数
+
+```
+    var name = "maomao"
+    const obj = {
+        name: 'CodeGorgeous',
+        print(sex, age) {
+            console.log(this.name, sex, age)
+        }
+    }
+    obj.print('male', 21) // CodeGorgeous 21
+    obj.print.call(window, 'woman', 14) // maomao 14
+    obj.print.apply(window, ['woman', 14]) // maomao 14
+    let result = obj.print.bind(window)
+    result() // maomao undefined undefined
+    result = result.bind(window, 'woman')
+    result() // maomao woman undefined
+    result = result.bind(window, 14) // 分多次上传
+    result() // maomao woman 14
+    obj.print('male', 21) // CodeGorgeous male 14
 ```
