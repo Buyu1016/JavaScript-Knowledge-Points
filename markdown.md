@@ -421,3 +421,69 @@
     console.log(Object.prototype.toString.call([])) // [object Array]
     console.log(Object.prototype.toString.call({})) // [object Object]
 ```
+
+# 如何理解事件代理?
+
+## 答: 事件代理可以理解为将本应该添加在某个元素的事件却添加到其父级身上, 通过给父级加上相应事件并通过判断e.target判断触发源进行触发事件, 可提交页面的性能, 减少DOM绑定的事件数量, 减少重复代码
+
+### 适合事件代理的事件有: click、mousedown、mouseup、keydown、keyup、keypress
+
+```
+    <!-- HTML -->
+    <div class="box">
+        <li>1</li>
+        <li>2</li>
+        <li>3</li>
+        <li>4</li>
+        <li>5</li>
+        <li>6</li>
+        <li>7</li>
+        <li>8</li>
+        <li>9</li>
+        <li>10</li>
+    </div>
+
+    <!-- Js -->
+    // 正常给li加事件
+    const oLis = document.querySelectorAll('li')
+    for (const element of oLis) {
+        element.onclick = (e) => {
+            console.log('普通', element.innerText)
+        }
+    }
+
+    // 事件代理
+    const oDiv = document.querySelector('.box')
+    // 把本应该添加给li的click事件委托给了div进行处理
+    oDiv.addEventListener('click', (e) => {
+        console.log('代理', e.target.innerText)
+    })
+```
+
+# 如何理解new操作符?
+
+## 答: new操作符用于创建一个给定构造函数的示例对象
+
+### new操作符执行流程: 创建对象 -> 将对象的__proto__连接到构造函数的prototype上 -> 改变构造函数的this指向, 指向到创建的对象 -> 看构造函数是否返回基本数据类型, 如果返回返回对象则正常处理
+
+```
+    function Student(name, sex) {
+        this.name = name;
+        this.sex = sex
+    }
+    const student1 = new Student('CodeGorgeous', 'male')
+    console.log(student1)
+
+    // 手动实现new操作符
+    function myNew(fn, ...arg) {
+        // 创建对象
+        const obj = {}
+        // 连接原型链
+        obj.__proto__ = fn.prototype
+        // 改变this指向
+        const resutl = fn.apply(obj,arg)
+        return resutl instanceof Object ? resutl : obj
+    }
+    const student2 = myNew(Student, 'maomao', 'woman')
+    console.log(student2)
+```
