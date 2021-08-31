@@ -571,3 +571,76 @@
     result() // maomao woman 14
     obj.print('male', 21) // CodeGorgeous male 14
 ```
+
+# 如何理解事件循环?
+
+## 答: Js是单线程运行的, 一个时间内只能做一件事情, 为了解决单线程运行造成运行阻塞问题, 设计了一种机制叫做事件循环
+
+### 事件分为同步和异步, 同步优先执行, 异步则是放置于任务队列中, 任务队列中分为宏队列和微队列, 一般为微队列比宏队列先执行
+
+### 常见的微队列: Promise.then、
+
+### 常见的宏队列: setTimeout、setInterval、Dom事件、Ajax
+
+```
+    console.log(1)
+
+    async function fn1() {
+        console.log('fn1 start')
+        await fn2()
+        console.log('fn1 end')
+    }
+    async function fn2() {
+        new Promise((resolve, reject) => {
+            console.log('fn2 start')
+            resolve('fn2')
+        }).then(resp => {
+            console.log(resp)
+            console.log('fn2 end')
+        })
+    }
+    fn1()
+    setTimeout(() => {
+        console.log('timeout')
+    })
+    console.log(2)
+
+    // 分析运行流程
+
+    // 1 -> fn1 start -> fn2 start -> 2 -> fn2 -> fn2 end -> fn1 end  -> timeout
+```
+
+# 什么是DOM? 谈一谈常见的Dom操作?
+
+## 答: DOM(Document Object Model)是一种用于HTML和XML文档的编程接口. 常见的DOM操作分为5种(创建节点/查询节点/更新节点/添加节点/删除节点)
+
+```
+    <!-- HTML -->
+    <div id="search">查询此节点</div>
+    <div id="delete">将要被删除的节点<span>嵌套子节点</span></div>
+    
+    <!-- Js -->
+    // 注: 每种操作暂只举一中方法
+    // 创建节点
+    const oDiv = document.createElement('div')
+    oDiv.innerText = '创建节点'
+    // 将节点插入body内
+    document.body.appendChild(oDiv)
+
+    // 查询节点
+    const oDiv2 = document.querySelector('#search')
+    console.log(oDiv2) // <div id="search">查询此节点</div>
+
+    // 更新节点
+    oDiv2.innerText += ' || 更新节点文本'
+    oDiv2.innerHTML += '<span> || 更新节点</span>'
+
+    // 添加节点
+    const oDiv3 = document.createElement('span')
+    oDiv3.innerText = ' || 添加节点'
+    oDiv2.appendChild(oDiv3) // innerHTML同时也具有添加节点的功能
+
+    // 删除节点
+    const oDiv4 = document.querySelector('#delete')
+    oDiv4.remove()
+```
