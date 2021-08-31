@@ -658,3 +658,68 @@
 ### screen记录当前屏幕的详情信息, 例如屏幕的位深等等
 
 ### navigator记录了当前浏览器的一些信息, 可以查询到当前浏览器的版本等等
+
+# 如何理解尾递归？
+
+## 更加有效的放置内存溢出, 不在一直保存某个变量, 而是将该次执行的结构作为参数给到下次一次执行的函数上
+
+```
+    // 普通递归
+    console.time('普通递归')
+    function pow(x, n) {
+        if (n === 1) {
+            return x
+        } else {
+            return x * pow(x, --n)
+        }
+    }
+    pow(5, 3) // 125
+    console.timeEnd('普通递归')
+
+    // 分析
+    // 5 * pow(5, 2)
+    // 5 * 5 * pow(5,1)
+    // 5 * 5 * 5
+    // 125
+
+    // 尾递归
+    console.time('尾递归')
+    function pow2(x, n, r = x) {
+        if (n === 1) return r
+        return pow2(x, --n, r * x)
+    }
+    pow2(5,3)
+    console.timeEnd('尾递归')
+
+    // 分析
+    // pow(5, 2, 5*5)
+    // pow(5, 1, 5*5*5)
+    // 5*5*5
+    // 125
+```
+
+# 存在内存泄露的情况?
+
+## 由于未及时释放内存, 造成该段内存不需要却仍然占据内存空间, 最终超出内存空间
+
+```
+    // 意外的全局变量
+    //  解决方法: 将该变量定义到该函数内部, 外部无法访问该变量
+    function print() {
+        this.name = 'CodeGorgeous'
+        sex = 'male'
+    }
+    print()
+    console.log(window.name, window.sex) // CodeGorgeous male
+
+    // 闭包
+    // 未释放函数内部执行期上下文
+    //  解决方法: 应使用立即执行函数
+    function print2() {
+        let name = 'maomao'
+        return () => {
+            console.log(name)
+        }
+    }
+    print2()() // maomao
+```
