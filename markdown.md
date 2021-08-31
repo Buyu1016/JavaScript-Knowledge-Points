@@ -618,7 +618,7 @@
     <!-- HTML -->
     <div id="search">查询此节点</div>
     <div id="delete">将要被删除的节点<span>嵌套子节点</span></div>
-    
+
     <!-- Js -->
     // 注: 每种操作暂只举一中方法
     // 创建节点
@@ -644,3 +644,17 @@
     const oDiv4 = document.querySelector('#delete')
     oDiv4.remove()
 ```
+
+# 什么是BOM? 谈一谈了解的BOM?
+
+## 答: BOM(Browser Object Model)是一种浏览器对象模型, 提供独立于内容和浏览器视口进行交互的对象, 常见的BOM有window、loaction、history、screen、navigator
+
+### window既作为全局对象同时也作为浏览器窗口的一个接口
+
+### location记录了当前页面的url地址及其一些详情信息
+
+### history主要操作跳转页面/回退页面, 记录url的历史记录
+
+### screen记录当前屏幕的详情信息, 例如屏幕的位深等等
+
+### navigator记录了当前浏览器的一些信息, 可以查询到当前浏览器的版本等等
