@@ -661,7 +661,7 @@
 
 # 如何理解尾递归？
 
-## 更加有效的放置内存溢出, 不在一直保存某个变量, 而是将该次执行的结构作为参数给到下次一次执行的函数上
+## 答: 更加有效的放置内存溢出, 不在一直保存某个变量, 而是将该次执行的结构作为参数给到下次一次执行的函数上
 
 ```
     // 普通递归
@@ -700,7 +700,7 @@
 
 # 存在内存泄露的情况?
 
-## 由于未及时释放内存, 造成该段内存不需要却仍然占据内存空间, 最终超出内存空间
+## 答: 由于未及时释放内存, 造成该段内存不需要却仍然占据内存空间, 最终超出内存空间
 
 ```
     // 意外的全局变量
@@ -726,6 +726,77 @@
 
 # JavaScript数字精度丢失问题及其解决方案?
 
-## 计算机存储双精度浮点数需要把十进制转换为二进制的科学计数法方式(X=a*2^e)的形式, 然后计算机以自己的规则(符号位+(指数位+指数偏移量的二进制)+小数部分)存储二进制,存储会有位数限制(64位), 某些十进制转换为二进制的时候会出现无限循环(), 会造成二进制的舍入操作(0舍1入), 当再次转换为十进制时就造成了计算误差
+## 答: 计算机存储双精度浮点数需要把十进制转换为二进制的科学计数法方式(X=a*2^e)的形式, 然后计算机以自己的规则(符号位+(指数位+指数偏移量的二进制)+小数部分)存储二进制,存储会有位数限制(64位), 某些十进制转换为二进制的时候会出现无限循环(), 会造成二进制的舍入操作(0舍1入), 当再次转换为十进制时就造成了计算误差
 
 ### 解决方案: 把浮点数乘以倍数,使其无小数位置, 用时除以倍数即可
+
+# 从输入URL到页面渲染的过程中发生了什么?
+
+## 答: 进行域名解析(查看电脑上是否缓存有相应的IP地址, 如果没有则继续向上层DNS服务器发出请求, 如果有则返回其Ip地址, 无则继续向DNS根服务器发出请求, 直到拿到Ip地址, 并把Ip地址在本机缓存, 加快下次访问速度) -> 建立TCP链接(拿到Ip后回想对应的服务器发起TCP链接请求, 通过三次握手建立链接) -> 建立Http请求(浏览器向服务器发送请求) -> 服务器处理请求(服务器返回浏览器相对应的资源) -> 关闭TCP链接(完成数据传输后, 会用过四次挥手关闭TCP链接) -> 浏览器解析资源(解析HTML生成DOM树, 解析Css生成Css规则树, 遇到外部资源则会重复此过程) -> 通过渲染树生成页面
+
+
+# 重排和重绘的区别? 如何减少重排和重绘?
+
+## 答: 重排(reflow)是相当于重新布置整个页面的布局, 浏览器计算出每个元素的相应位置, 重绘是相当于重新绘制某个元素的样式. 重排一定重绘, 重绘不一定触发重排
+
+### 优化: 减少重排和重绘就是相当于减少对渲染树的操作
+
+### 1: 切换样式时切换其class. 2: 使用文档片段(创建一个节点在此节点内放置内容, 然后覆盖某个改动节点即可)
+
+```
+    var oDiv = document.querySelector('.div');
+    oDiv.style.width = '200px';
+    oDiv.style.background = 'red';
+    oDiv.style.height = '300px';
+    // 此段代码触发了两次重排三次重绘
+```
+
+# 防抖和节流的区别及其实现方法?
+
+## 答: 防抖(debounce)是指触发高频率事件后n秒内只会执行一次函数(按照最后一次触发的时间进行计算). 节流(throttle)是指高频率触发事件后在n秒内只会执行一次(按照第一次触发的时间进行计算)
+
+```
+    <!-- HTML -->
+    <div class="num">1</div>
+    <button class="debounce">防抖click</button>
+    <button class="throttle">节流click</button>
+
+    <!-- Js -->
+    const oNum = document.querySelector('.num')
+    const oBtnDebounce = document.querySelector('.debounce')
+    const oBtnThrottle = document.querySelector('.throttle')
+
+    // 函数防抖
+    function debounce(fn, delay = 3000) {
+        // 延时器
+        let timer = null
+        return function(e) {
+            // 先进行清除上一次的延时器
+            clearTimeout(timer)
+            timer = setTimeout(() => {
+                fn.apply(this, arguments)
+            }, delay)
+        }
+    }
+
+    // 函数节流
+    function throttle(fn, delay = 3000) {
+        let lock = false
+        return function() {
+            if (lock) return
+            lock = true
+            setTimeout(() => {
+                fn.apply(this, arguments)
+                lock = false
+            }, delay)
+        }
+    }
+
+    oBtnDebounce.addEventListener('click', debounce(addNumber, 1000))
+
+    oBtnThrottle.addEventListener('click', throttle(addNumber, 1000))
+
+    function addNumber() {
+        oNum.innerText = ++oNum.innerText
+    }
+```
