@@ -80,7 +80,7 @@
     const student1 = new Student('CodeGorgeous')
 ```
 
-![原型链示意图](./image/原型链示意图.jpg)
+![原型链示意图](http://qiniu.codegorgeous.top/prototype.jpg)
 
 # 如何理解闭包?
 
